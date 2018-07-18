@@ -1,0 +1,29 @@
+---
+- hosts: localhost
+  tasks:
+  - name: install httpd
+    yum:
+      name: httpd
+      state: present
+    notify:
+     - restart httpd
+  - name: create a file
+    shell:  echo "hello" >> /var/www/html/index.html
+  - name: new disp.any files
+    file:
+      path: /opt/ansible/{{ item }}
+      content:
+        hello Ansible
+      state: touch
+    with_items:
+         - dispatcher.any
+         - dispatcher.conf
+  
+
+
+  - name: start httpd
+    service: name=httpd state=started
+  - name: copy httpd.conf
+    copy: src={{ item }} dest=/etc/httpd/conf
+    with_fileglob:
+         - "dispatcher.*"
